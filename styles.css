@@ -487,6 +487,49 @@ a.lesson-row:hover { background: #f8faff; }
 .video-shell { position: relative; aspect-ratio: 16 / 9; background: #05070f; }
 .video-shell video, .video-shell iframe { width: 100%; height: 100%; display: block; background: #05070f; }
 .video-shell iframe { border: 0; }
+.fs-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, .22);
+  border-radius: 10px;
+  background: rgba(5, 7, 15, .55);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+.fs-btn:hover { background: rgba(5, 7, 15, .82); border-color: rgba(255, 255, 255, .45); }
+.fs-btn svg { width: 18px; height: 18px; }
+.video-shell:fullscreen,
+.video-shell.video-pseudo-fs {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  aspect-ratio: auto;
+  background: #000;
+}
+.video-shell:fullscreen video,
+.video-shell:fullscreen iframe,
+.video-shell.video-pseudo-fs video,
+.video-shell.video-pseudo-fs iframe {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.video-shell.video-pseudo-fs {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+}
+.video-shell:fullscreen .fs-btn,
+.video-shell.video-pseudo-fs .fs-btn { top: 18px; right: 18px; z-index: 5; }
+html.fs-lock,
+html.fs-lock body { overflow: hidden; }
 .video-placeholder[hidden] { display: none; }
 .video-placeholder {
   position: absolute;
@@ -496,6 +539,7 @@ a.lesson-row:hover { background: #f8faff; }
   color: rgba(255, 255, 255, .55);
   font-size: 13px;
   font-weight: 600;
+  pointer-events: none;
 }
 .player-body { padding: 16px; }
 .player-title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }

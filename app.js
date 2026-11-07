@@ -53,7 +53,9 @@ const ICONS = {
   code: '<path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/>',
   save: '<path d="M5 3h12l2 2v16H5z"/><path d="M8 3v6h8V3"/><path d="M8 21v-7h8v7"/>',
   refresh: '<path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v6h-6"/>',
-  terminal: '<path d="m4 7 5 5-5 5"/><path d="M12 19h8"/>'
+  terminal: '<path d="m4 7 5 5-5 5"/><path d="M12 19h8"/>',
+  expand: '<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/>',
+  collapse: '<path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M16 3v3a2 2 0 0 0 2 2h3"/><path d="M8 21v-3a2 2 0 0 0-2-2H3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>'
 };
 
 const $ = (sel, root = document) => root.querySelector(sel);
@@ -1468,6 +1470,7 @@ function renderPlayerCard(course, topic, unit, res, lang) {
         ? `<iframe id="lessonFrame" class="youtube-frame" src="${attr(embedUrl)}" title="${attr(unit.name)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`
         : `<video id="lessonVideo" controls playsinline preload="metadata"></video>
       <div class="video-placeholder" id="videoPlaceholder">Loading stream…</div>`}
+      <button class="fs-btn" id="fsBtn" type="button" aria-label="Fullscreen" title="Fullscreen">${icon("expand")}</button>
     </div>
     <div class="player-body">
       <div class="player-title-row">
@@ -1540,6 +1543,70 @@ function renderRail(course, topic, unit) {
 function activateTab(id) {
   $$(".tab-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.tab === id));
   $$(".tab-panel").forEach(panel => { panel.hidden = panel.dataset.panel !== id; });
+}
+
+function syncFsButtons() {
+  $$(".video-shell").forEach(shell => {
+    const btn = $(".fs-btn", shell);
+    if (!btn) return;
+    const active = document.fullscreenElement === shell
+      || shell.classList.contains("video-pseudo-fs")
+      || (document.fullscreenElement && document.fullscreenElement.tagName === "VIDEO");
+    btn.classList.toggle("is-fs", !!active);
+    btn.innerHTML = icon(active ? "collapse" : "expand");
+    btn.setAttribute("aria-label", active ? "Exit fullscreen" : "Fullscreen");
+    btn.title = active ? "Exit fullscreen" : "Fullscreen";
+  });
+}
+
+function exitPseudoFullscreen() {
+  $$(".video-shell.video-pseudo-fs").forEach(shell => shell.classList.remove("video-pseudo-fs"));
+  document.documentElement.classList.remove("fs-lock");
+  syncFsButtons();
+}
+
+async function togglePlayerFullscreen(shell) {
+  if (!shell) return;
+  const video = $("#lessonVideo", shell);
+  if (document.fullscreenElement) {
+    try { await document.exitFullscreen(); } catch (err) { /* already gone */ }
+    return;
+  }
+  if (shell.classList.contains("video-pseudo-fs")) {
+    exitPseudoFullscreen();
+    return;
+  }
+  try {
+    if (shell.requestFullscreen) await shell.requestFullscreen();
+    else if (shell.webkitRequestFullscreen) shell.webkitRequestFullscreen();
+    else if (video && video.webkitEnterFullscreen) { video.webkitEnterFullscreen(); return; }
+    else throw new Error("fullscreen unavailable");
+  } catch (err) {
+    shell.classList.add("video-pseudo-fs");
+    document.documentElement.classList.add("fs-lock");
+  }
+  syncFsButtons();
+}
+
+function bindPlayerFullscreen() {
+  const shell = $(".video-shell");
+  const btn = $("#fsBtn");
+  if (!shell || !btn) return;
+  btn.addEventListener("click", () => togglePlayerFullscreen(shell));
+  shell.addEventListener("dblclick", e => {
+    if (e.target.tagName === "VIDEO") {
+      e.preventDefault();
+      togglePlayerFullscreen(shell);
+    }
+  });
+}
+
+function bindPlayerFullscreenEvents() {
+  document.addEventListener("fullscreenchange", syncFsButtons);
+  document.addEventListener("webkitfullscreenchange", syncFsButtons);
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape" && $(".video-shell.video-pseudo-fs")) exitPseudoFullscreen();
+  });
 }
 
 function attachStream(video, url) {
@@ -1655,6 +1722,7 @@ async function renderLesson(courseId, unitId, params) {
   `;
 
   if (isVideo) {
+    bindPlayerFullscreen();
     const video = $("#lessonVideo");
     if (video && !youtube && res.videos[lang]) attachStream(video, res.videos[lang].url);
     $$(".lang-btn[data-lang]").forEach(btn => {
@@ -1973,6 +2041,7 @@ function bindGlobalEvents() {
     if (!frame || event.source !== frame.contentWindow) return;
     pgConsole(data.type || "log", (data.args || []).join(" "));
   });
+  bindPlayerFullscreenEvents();
 }
 
 async function init() {
