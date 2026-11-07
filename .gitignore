@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# SQLite sidecars
+*.db-wal
+*.db-shm
+
+# Logs and temporary files
+*.log
+*.tmp
+.DS_Store
+.idea/
+.vscode/
+node_modules/

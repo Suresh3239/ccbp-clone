@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#141a3a">
+  <title>CCBP Learning — Offline Clone</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <a class="brand" href="#/">
+      <span class="brand-mark">C</span>
+      <span class="brand-text">CCBP<span>Learning</span></span>
+    </a>
+    <form class="search-form" id="searchForm" role="search">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="globalSearch" type="search" placeholder="Search courses, topics, lessons" autocomplete="off">
+    </form>
+    <div class="top-actions">
+      <a class="top-link" href="#/practice">Practice</a>
+      <a class="top-link" href="#/playground">Playground</a>
+      <a class="top-link" href="#/library">Library</a>
+      <a class="top-link" href="#/data">Data</a>
+      <span class="streak-pill" title="Collected lessons">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1.5 4.2-1.2 5.1-1.2 7.6 0 1.1.8 2 1.9 2.2-1.4 1-2.4 2.5-2.4 4.2A4.7 4.7 0 0 0 15 21c2.8 0 5-2.2 5-5 0-4.4-4.1-6.3-5.4-10.6C14.2 3.9 13.2 3.3 12 3Z"/></svg>
+        <span id="topCount">0</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-inner">
+        <div class="side-section">
+          <p class="side-label">Journey</p>
+          <a class="side-link" data-nav href="#/">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+            Home
+          </a>
+          <a class="side-link" data-nav href="#/library">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg>
+            Library
+          </a>
+          <a class="side-link" data-nav href="#/playground">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/></svg>
+            Playground
+          </a>
+          <a class="side-link" data-nav href="#/practice">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 7 5 5-5 5"/><path d="M12 19h8"/></svg>
+            Practice
+          </a>
+          <a class="side-link" data-nav href="#/links">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></svg>
+            All video links
+          </a>
+          <a class="side-link" data-nav href="#/data">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>
+            Downloads
+          </a>
+        </div>
+        <div class="side-section side-courses-wrap">
+          <p class="side-label">Courses</p>
+          <div class="side-courses" id="sideCourses"></div>
+        </div>
+        <div class="side-section">
+          <p class="side-label">Default language</p>
+          <select class="select" id="prefLang" aria-label="Default video language"></select>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main" id="main" tabindex="-1">
+      <div class="loading">
+        <span class="spinner"></span>
+        Loading your journey
+      </div>
+    </main>
+  </div>
+
+  <nav class="bottom-nav" aria-label="Primary">
+    <a href="#/" data-nav>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 11 9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#/library" data-nav>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7v14H4zM13 5h7v14h-7z"/></svg>
+      <span>Library</span>
+    </a>
+    <a href="#/playground" data-nav>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6"/><path d="m16 6 6 6-6 6"/></svg>
+      <span>Code</span>
+    </a>
+    <a href="#/practice" data-nav>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 7 5 5-5 5"/><path d="M12 19h8"/></svg>
+      <span>Practice</span>
+    </a>
+    <a href="#/search" data-nav>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <span>Search</span>
+    </a>
+  </nav>
+
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="vendor/marked.min.js"></script>
+  <script src="vendor/hls.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
